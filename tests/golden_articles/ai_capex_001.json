@@ -1,0 +1,26 @@
+{
+  "title": "AI chip investment test article",
+  "url": "https://example.com/golden/ai-capex-001",
+  "source": "Synthetic Golden News",
+  "raw_text": "Nvidia said it will invest $5 billion in Intel. Analysts expect this may reshape AI chip competition.",
+  "expected_mentions": ["Nvidia", "Intel"],
+  "expected_facts": [
+    {
+      "predicate": "reported_numeric_development",
+      "value": 5000000000,
+      "currency": "USD"
+    }
+  ],
+  "expected_claims": [
+    {
+      "claim_type": "attributed_statement",
+      "evidence_contains": "said"
+    },
+    {
+      "claim_type": "interpretation",
+      "evidence_contains": "expect"
+    }
+  ],
+  "expected_entity_links": []
+}
+

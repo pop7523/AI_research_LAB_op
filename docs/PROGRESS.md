@@ -4,8 +4,8 @@
 
 ## 현재 상태
 
-- 현재 기준 phase: Phase 5 완료
-- 다음 예정 phase: Phase 6. Fact / Claim 추출 MVP
+- 현재 기준 phase: Phase 12 완료
+- 다음 예정 phase: Phase 13. Audit / Evaluation 고도화
 - 마지막 갱신: 2026-05-26
 
 ## 완료된 Phase
@@ -18,10 +18,17 @@
 | Phase 3 | 완료 | LLM provider interface, fake provider, JSON parser/retry, guardrail prompt |
 | Phase 4 | 완료 | Entity/EntityAlias/Mention 모델, entity API, mention extraction |
 | Phase 5 | 완료 | alias/type/ticker 기반 entity linking, ambiguous review 처리 |
+| Phase 6 | 완료 | Fact/Claim 모델, evidence 필수 제약, rule-based extraction MVP |
+| Phase 7 | 완료 | Fact verification 상태 흐름, matching/number mismatch/review queue |
+| Phase 8 | 완료 | Event/Issue 모델, article 기반 event/issue builder MVP |
+| Phase 9 | 완료 | Issue 기반 perspective analysis MVP |
+| Phase 10 | 완료 | Integrity review, counterargument, balance review MVP |
+| Phase 11 | 완료 | Report draft generation, approve/publish guard |
+| Phase 12 | 완료 | Review queue, approve/reject/revision action, audit log |
 
 ## 최근 검증 결과
 
-- `pytest`: 11 passed
+- `pytest`: 25 passed
 - `ruff check .`: All checks passed
 - `alembic upgrade head`: 성공
 - `docker compose config`: 성공
@@ -33,13 +40,16 @@
 
 ## 다음 작업
 
-Phase 6에서 진행할 일:
-- Fact 모델 구현
-- Claim 모델 구현
-- evidence reference 필수 제약 구현
-- Fact/Claim extraction schema 구현
-- fake extraction service와 테스트 구현
-- Fact/Claim 저장 API 또는 article extraction pipeline 확장
+Phase 13에서 진행할 일:
+- audit log 커버리지 확대
+- task execution log와 prompt version 저장
+- extraction/linking/report evaluation fixture 확장
+- regression evaluation command 추가
+- quality metrics 산출
+
+운영 참고:
+- `backend/scripts/collect_test_articles.py`는 RSS 수집을 시도하고, 네트워크/피드 실패 시 deterministic fallback fixture를 생성한다.
+- 현재 `tests/golden_articles/rss_collected.json`은 fallback test article로 생성되었다.
 
 ## 운영 규칙
 
@@ -47,4 +57,3 @@ Phase 6에서 진행할 일:
 - phase 진행 중 중요한 결정은 이 문서의 진행상황에 반영한다.
 - phase 완료 시 검증 결과를 이 문서에 기록한다.
 - 구현 변경사항은 `docs/CHANGELOG.md`에 별도로 기록한다.
-

@@ -15,8 +15,10 @@ from app.schemas.entity_schema import (
     MentionRead,
     MentionResolveRequest,
 )
+from app.services.audit.audit_logger import log_action
 from app.services.extraction.mention_extractor import extract_mentions_for_article
 from app.services.linking.entity_linker import link_mentions_for_article
+from app.services.review.review_service import ensure_review_item
 
 router = APIRouter(tags=["entities"])
 
@@ -78,6 +80,15 @@ def link_article_mentions(article_id: str, db: Session = Depends(get_db)) -> lis
     if db.get(Article, article_id) is None:
         raise HTTPException(status_code=404, detail="article not found")
     mentions = link_mentions_for_article(db, article_id)
+    for mention in mentions:
+        if mention.needs_review:
+            ensure_review_item(
+                db,
+                target_type="mention",
+                target_id=mention.id,
+                reason=mention.linking_status,
+                confidence=mention.linking_confidence,
+            )
     db.commit()
     return mentions
 
@@ -99,7 +110,18 @@ def resolve_mention(
     mention.linking_confidence = payload.confidence
     mention.linking_reason = payload.reason
     mention.needs_review = False
+    log_action(
+        db,
+        actor_type="human",
+        actor_name="reviewer",
+        action="resolve_mention",
+        target_type="mention",
+        target_id=mention.id,
+        input_refs={"entity_id": entity.id},
+        output_summary={"linking_status": mention.linking_status},
+        confidence=payload.confidence,
+        reason=payload.reason,
+    )
     db.commit()
     db.refresh(mention)
     return mention
-

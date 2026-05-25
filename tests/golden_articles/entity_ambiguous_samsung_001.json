@@ -1,0 +1,21 @@
+{
+  "title": "Ambiguous Samsung test article",
+  "url": "https://example.com/golden/entity-ambiguous-samsung-001",
+  "source": "Synthetic Golden News",
+  "raw_text": "삼성은 대규모 투자를 검토 중이라고 밝혔다.",
+  "expected_mentions": ["삼성"],
+  "expected_facts": [],
+  "expected_claims": [
+    {
+      "claim_type": "attributed_statement",
+      "evidence_contains": "밝혔다"
+    }
+  ],
+  "expected_entity_links": [
+    {
+      "mention": "삼성",
+      "status": "AMBIGUOUS"
+    }
+  ]
+}
+

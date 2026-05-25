@@ -6,11 +6,11 @@
 
 현재 프로젝트는 Phase 0-5 범위에서는 대체로 SPEC에 부합한다. FastAPI skeleton, Source/Article, cleaner/evidence span, LLM abstraction, Entity/Mention, Entity Linking MVP는 실제 코드와 테스트로 구현되어 있다.
 
-다만 전체 SPEC 기준으로는 아직 초기 골격이며, Fact/Claim/Verification 단계로 넘어가기 전에 몇 가지 침식 위험을 정리해야 한다.
+Phase 12까지의 MVP 구현 후에도 전체 SPEC 기준으로는 고도화가 필요하지만, Fact/Claim/Verification/Review/Report의 기본 흐름은 끊기지 않게 연결되어 있다.
 
 ## 검증 결과
 
-- `pytest`: 11 passed
+- `pytest`: 25 passed
 - `ruff check .`: All checks passed
 - Git 상태: `main...origin/main`, clean
 
@@ -27,7 +27,9 @@
 
 ### 1. Ambiguous entity가 linked_entity_id에 저장됨
 
-`AMBIGUOUS` 상태에서도 top candidate가 `linked_entity_id`에 저장된다. 이는 "애매한 엔티티는 억지로 연결하지 않는다"는 원칙과 충돌할 수 있다.
+상태: 해결됨.
+
+`AMBIGUOUS` 상태에서는 `linked_entity_id`를 저장하지 않도록 수정했다. 후보 힌트는 `linking_reason`에 남기며, review queue로 보낸다.
 
 권장:
 - `AMBIGUOUS` 상태에서는 `linked_entity_id`를 `null`로 둔다.
@@ -35,19 +37,15 @@
 
 ### 2. Evidence offset이 반복 문단에서 틀릴 수 있음
 
-sentence splitter가 `clean_text.find(paragraph)`를 사용한다. 같은 문단 텍스트가 반복되면 두 번째 문단의 offset도 첫 번째 문단 위치로 계산될 수 있다.
+상태: 해결됨.
 
-권장:
-- paragraph 위치를 누적 offset 방식으로 계산한다.
-- 반복 문단 케이스를 테스트에 추가한다.
+paragraph 위치를 누적 offset 방식으로 계산하도록 수정했고, 반복 문단 회귀 테스트를 추가했다.
 
 ### 3. Manual resolve에 audit/review 기록이 없음
 
-`/mentions/{id}/resolve`는 사람이 직접 entity를 확정하는 중요한 행위지만 현재 audit log가 없다.
+상태: 부분 해결.
 
-권장:
-- Phase 13까지 기다리지 말고 manual review action부터 audit log 기준을 세운다.
-- resolve action에 actor, target, reason, confidence를 남긴다.
+mention resolve와 review action은 audit log를 남긴다. Phase 13에서는 전체 pipeline과 agent output으로 audit coverage를 확장해야 한다.
 
 ### 4. 전체 SPEC 원문이 보존되어 있지 않음
 
@@ -59,11 +57,9 @@ sentence splitter가 `clean_text.find(paragraph)`를 사용한다. 같은 문단
 
 ### 5. `/articles/{id}/extract`의 의미가 넓어질 위험
 
-현재 extract endpoint는 mention만 추출한다. Phase 6부터 Fact/Claim extraction이 추가되면 endpoint 의미가 혼동될 수 있다.
+상태: 부분 해결.
 
-권장:
-- mention 전용 endpoint와 Fact/Claim 전용 endpoint를 분리한다.
-- 예: `/articles/{id}/extract-mentions`, `/articles/{id}/extract-facts-claims`, `/articles/{id}/run-structure-pipeline`
+Fact/Claim extraction은 `/articles/{id}/extract-facts-claims`로 분리했다. 기존 `/articles/{id}/extract`는 mention extraction 의미로 남아 있어 추후 alias endpoint 추가가 필요하다.
 
 ## 현재 실제 흐름
 
@@ -75,6 +71,14 @@ source/article 생성
   -> alias 기반 mention 추출
   -> entity linking
   -> ambiguous review flag
+  -> Fact/Claim extraction
+  -> Verification
+  -> Event/Issue building
+  -> Issue analysis
+  -> Integrity review
+  -> Report draft
+  -> Human review queue
+  -> Report approval/publish guard
 ```
 
 이 흐름은 Phase 0-5 MVP로 적절하다.
@@ -92,7 +96,7 @@ Fact/Claim
   -> Audit/Evaluation
 ```
 
-이는 현재 phase 기준 정상적인 미구현이다.
+Phase 12 MVP에서 위 흐름의 최소 구현은 완료되었다. 다만 각 단계는 아직 rule-based MVP이며, Phase 13 이후 평가와 audit coverage 확장이 필요하다.
 
 ## 다음 우선순위
 
@@ -110,4 +114,3 @@ Phase 6으로 넘어가기 전 선행 수정:
 4. extraction schema
 5. fake extraction service
 6. Fact/Claim 저장 API 또는 pipeline 확장
-

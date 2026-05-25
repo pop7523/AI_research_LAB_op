@@ -89,3 +89,58 @@ Tests:
 - 현재 Phase 0-5 구현이 전체 SPEC에 부합하는지 점검
 - AI 개발 과정에서 생길 수 있는 구조적 침식 위험 정리
 - Phase 6 진입 전 선행 수정 권장사항 기록
+
+## 2026-05-26. Phase 6-12 MVP 구현
+
+Phase 6:
+- `Fact`, `Claim` 모델 추가
+- evidence text check constraint 추가
+- `POST /articles/{id}/extract-facts-claims` 추가
+- rule-based Fact/Claim extraction MVP 추가
+- Fact/Claim evidence 필수 테스트 추가
+
+Phase 7:
+- Fact verification 상태 흐름 추가
+- `POST /facts/{id}/verify`, `POST /facts/{id}/mark-disputed` 추가
+- official source 기반 verified 판정과 number mismatch review queue 테스트 추가
+
+Phase 8:
+- `Event`, `EventLink`, `Issue`, `IssueLink` 모델 추가
+- `POST /articles/{id}/build-event-issue` 추가
+- article fact/claim 기반 event/issue builder MVP 추가
+
+Phase 9:
+- `Perspective` 모델 추가
+- `POST /issues/{id}/analyze` 추가
+- positive/negative/neutral perspective analysis MVP 추가
+
+Phase 10:
+- integrity review service 추가
+- `POST /issues/{id}/integrity-review` 추가
+- evidence assessment, counterarguments, assumptions, balance review 구조 추가
+
+Phase 11:
+- `Report` 모델 추가
+- `POST /issues/{id}/generate-report` 추가
+- `POST /reports/{id}/submit-review`, `approve`, `publish` 상태 guard 추가
+
+Phase 12:
+- `ReviewItem`, `AuditLog` 모델 추가
+- `GET /review-queue`와 review action API 추가
+- mention resolve와 review action audit logging 추가
+
+Test data:
+- `tests/golden_articles/*.json` golden article fixtures 추가
+- `backend/scripts/collect_test_articles.py` RSS/fallback 수집 스크립트 추가
+- `tests/golden_articles/rss_collected.json` fallback 수집 결과 추가
+
+Quality fixes:
+- ambiguous entity는 `linked_entity_id`를 저장하지 않도록 수정
+- 반복 문단 sentence offset 계산 오류 방지
+
+검증:
+- `pytest`: 25 passed
+- `ruff check .`: All checks passed
+- SQLite `alembic upgrade head`: 성공
+- Docker Compose config: 성공
+- Uvicorn `/health` smoke test: 성공

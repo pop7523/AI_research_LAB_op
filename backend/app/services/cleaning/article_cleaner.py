@@ -19,8 +19,10 @@ def clean_article_text(raw_text: str) -> str:
 
 def split_sentences(clean_text: str) -> list[SentenceSpan]:
     spans: list[SentenceSpan] = []
+    search_offset = 0
     for paragraph_index, paragraph in enumerate(clean_text.split("\n\n")):
-        paragraph_start = clean_text.find(paragraph)
+        paragraph_start = clean_text.find(paragraph, search_offset)
+        search_offset = paragraph_start + len(paragraph) + 2
         sentence_index = 0
         for match in re.finditer(r".+?(?:[.!?。]|다\.|요\.|니다\.|$)(?=\s|$)", paragraph):
             text = match.group(0).strip()
@@ -39,4 +41,3 @@ def split_sentences(clean_text: str) -> list[SentenceSpan]:
             )
             sentence_index += 1
     return spans
-

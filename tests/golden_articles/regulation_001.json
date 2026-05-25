@@ -1,0 +1,16 @@
+{
+  "title": "AI regulation test article",
+  "url": "https://example.com/golden/regulation-001",
+  "source": "Synthetic Golden News",
+  "raw_text": "The regulator said new AI rules may require additional disclosure from chip companies.",
+  "expected_mentions": [],
+  "expected_facts": [],
+  "expected_claims": [
+    {
+      "claim_type": "attributed_statement",
+      "evidence_contains": "said"
+    }
+  ],
+  "expected_entity_links": []
+}
+

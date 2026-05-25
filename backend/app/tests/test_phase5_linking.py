@@ -54,5 +54,5 @@ def test_ambiguous_alias_requires_review(client):
 
     mention = response.json()[0]
     assert mention["linking_status"] == EntityLinkingStatus.AMBIGUOUS
+    assert mention["linked_entity_id"] is None
     assert mention["needs_review"] is True
-

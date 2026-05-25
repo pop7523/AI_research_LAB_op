@@ -55,10 +55,14 @@ def link_mention(db: Session, mention: Mention) -> Mention:
     status, candidate, needs_review = classify_link(score_link_candidates(db, mention))
     mention.linking_status = status
     mention.needs_review = needs_review
-    if candidate is not None:
+    if candidate is not None and status != EntityLinkingStatus.AMBIGUOUS.value:
         mention.linked_entity_id = candidate.entity.id
         mention.linking_confidence = candidate.score
         mention.linking_reason = candidate.reason
+    elif candidate is not None:
+        mention.linked_entity_id = None
+        mention.linking_confidence = candidate.score
+        mention.linking_reason = f"ambiguous_candidate:{candidate.entity.id}:{candidate.reason}"
     else:
         mention.linked_entity_id = None
         mention.linking_confidence = None

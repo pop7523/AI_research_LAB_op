@@ -22,6 +22,17 @@ def test_split_sentences_keeps_evidence_offsets():
     assert clean[spans[0].start_offset : spans[0].end_offset] == spans[0].text
 
 
+def test_split_sentences_handles_repeated_paragraph_offsets():
+    clean = "Repeat sentence.\n\nRepeat sentence."
+
+    spans = split_sentences(clean)
+
+    assert len(spans) == 2
+    assert spans[0].start_offset == 0
+    assert spans[1].start_offset == len("Repeat sentence.\n\n")
+    assert clean[spans[1].start_offset : spans[1].end_offset] == spans[1].text
+
+
 def test_clean_endpoint_creates_sentence_evidence(client):
     article = client.post(
         "/articles",
@@ -35,4 +46,3 @@ def test_clean_endpoint_creates_sentence_evidence(client):
     assert body["article"]["status"] == ArticleStatus.CLEANED
     assert len(body["sentences"]) == 2
     assert body["sentences"][0]["text"] == "First sentence."
-
