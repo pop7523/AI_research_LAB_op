@@ -80,3 +80,12 @@ Tests:
 - `docker compose config`: 성공
 - Uvicorn HTTP smoke test 성공
 
+## 2026-05-26. SPEC 부합성 점검 문서화
+
+문서:
+- `docs/SPEC_ALIGNMENT_REVIEW.md` 추가
+
+내용:
+- 현재 Phase 0-5 구현이 전체 SPEC에 부합하는지 점검
+- AI 개발 과정에서 생길 수 있는 구조적 침식 위험 정리
+- Phase 6 진입 전 선행 수정 권장사항 기록
